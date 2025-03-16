@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"sync"
+	"time"
 )
 
 // PaymentMethod interface (Common Interface)
@@ -13,6 +15,7 @@ type PaymentMethod interface {
 type CreditCard struct{}
 
 func (c *CreditCard) ProcessPayment(amount float64) {
+	time.Sleep(1 * time.Second) // Simulate processing delay
 	fmt.Printf("[Credit Card] Payment of $%.2f processed successfully.\n", amount)
 }
 
@@ -20,6 +23,7 @@ func (c *CreditCard) ProcessPayment(amount float64) {
 type PayPal struct{}
 
 func (p *PayPal) ProcessPayment(amount float64) {
+	time.Sleep(1 * time.Second) // Simulate processing delay
 	fmt.Printf("[PayPal] Payment of $%.2f processed successfully.\n", amount)
 }
 
@@ -27,6 +31,7 @@ func (p *PayPal) ProcessPayment(amount float64) {
 type AmazonPay struct{}
 
 func (a *AmazonPay) ProcessPayment(amount float64) {
+	time.Sleep(1 * time.Second) // Simulate processing delay
 	fmt.Printf("[Amazon Pay] Payment of $%.2f processed successfully.\n", amount)
 }
 
@@ -47,8 +52,10 @@ func (f *PaymentFactory) CreatePaymentMethod(method string) (PaymentMethod, erro
 	}
 }
 
-// ProcessOrder - Simulates processing a payment using the factory
-func ProcessOrder(factory *PaymentFactory, method string, amount float64) {
+// ProcessOrder - Uses Goroutines for concurrent payment processing
+func ProcessOrder(wg *sync.WaitGroup, factory *PaymentFactory, method string, amount float64) {
+	defer wg.Done()
+
 	paymentMethod, err := factory.CreatePaymentMethod(method)
 	if err != nil {
 		fmt.Printf("[ERROR] %v\n", err)
@@ -59,10 +66,27 @@ func ProcessOrder(factory *PaymentFactory, method string, amount float64) {
 
 func main() {
 	factory := &PaymentFactory{}
+	var wg sync.WaitGroup
 
-	// Test different payment methods
-	ProcessOrder(factory, "creditcard", 100.50)
-	ProcessOrder(factory, "paypal", 250.75)
-	ProcessOrder(factory, "amazonpay", 150.00)
-	ProcessOrder(factory, "bitcoin", 500.00) // Unsupported payment method
+	// Concurrent Payment Processing Using Goroutines
+	transactions := []struct {
+		method string
+		amount float64
+	}{
+		{"creditcard", 100.50},
+		{"paypal", 250.75},
+		{"amazonpay", 150.00},
+		{"bitcoin", 500.00}, // Unsupported payment method
+		{"creditcard", 200.00},
+	}
+
+	for _, txn := range transactions {
+		wg.Add(1)
+		go ProcessOrder(&wg, factory, txn.method, txn.amount)
+	}
+
+	// Wait for all Goroutines to complete
+	wg.Wait()
+
+	fmt.Println("✅ All transactions have been processed successfully.")
 }
