@@ -15,3 +15,9 @@ Imagine you're developing a **Cache Manager** for a large-scale distributed syst
 ✅ Allow **adding** and **retrieving** key-value pairs.  
 ✅ Implement **LRU eviction** when the cache exceeds its capacity.  
 ✅ Ensure **thread-safety** for concurrent access.  
+
+
+## 💬 Bonus Challenge
+
+🔹 Try extending this solution to support TTL (Time-To-Live) for cache entries.
+🔹 Implement a feature to persist cache data to disk for recovery after restarts.
