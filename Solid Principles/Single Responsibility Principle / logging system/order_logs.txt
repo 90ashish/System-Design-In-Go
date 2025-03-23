@@ -1,0 +1,2 @@
+[INFO] Starting order processing: ORD-456
+[INFO] Order ORD-456 processed successfully!
