@@ -1,187 +1,177 @@
-9. Security & Authentication
+# 9. Security & Authentication
 
 Keeping systems secure requires layered controls—from authenticating API calls to protecting data in flight and at rest. Below, each topic is broken down with simple examples.
-9.1 API Authentication
-OAuth 2.0
 
-    What it is: An authorization framework where a client (e.g., web or mobile app) obtains an access token to act on behalf of a user.
+---
 
-    Roles:
+## 9.1 API Authentication
 
-        Resource Owner: The user.
+### OAuth 2.0
 
-        Client: Your application.
+- **What it is**: An authorization framework where a client (e.g., web or mobile app) obtains an access token to act on behalf of a user.
 
-        Authorization Server: Issues tokens.
+**Roles**:
+- **Resource Owner**: The user.
+- **Client**: Your application.
+- **Authorization Server**: Issues tokens.
+- **Resource Server**: Hosts protected APIs.
 
-        Resource Server: Hosts protected APIs.
+**Flow (Authorization Code Grant)**:
+1. User logs into Auth Server and consents.
+2. Client receives an authorization code.
+3. Client exchanges code (plus secret) for an access token.
+4. Client calls Resource Server with `Authorization: Bearer <token>`.
 
-    Flow (Authorization Code Grant):
+**Example**:
+```text
+Browser → GET /authorize?response_type=code&client_id=xyz
+Auth server → redirect back with ?code=ABC
+Client → POST /token (code, secret) → receives { access_token, refresh_token }
+Client → GET /orders with Authorization: Bearer access_token
+```
 
-        User logs into Auth Server and consents.
+---
 
-        Client receives an authorization code.
+### OpenID Connect (OIDC)
 
-        Client exchanges code (plus secret) for an access token.
+- **What it is**: A thin identity layer on top of OAuth 2.0 that returns an ID token (a JWT) containing user profile claims (e.g., email, name).
 
-        Client calls Resource Server with Authorization: Bearer <token>.
+**Use Case**: Authenticate users (prove identity) as well as authorize.
 
-    Example:
+---
 
-        Browser → GET /authorize?response_type=code&client_id=xyz.
+### JSON Web Tokens (JWT)
 
-        Auth server → redirect back with ?code=ABC.
+- **Structure**:
+  - Header (algorithm, type)
+  - Payload (claims: sub, exp, custom data)
+  - Signature (HMAC or RSA)
 
-        Client → POST /token (code, secret) → receives { access_token, refresh_token }.
+**Why**: Self-contained; no need to lookup session in DB for every request.
 
-        Client → GET /orders with Authorization: Bearer access_token.
+**Example Payload**:
+```json
+{
+  "sub": "user123",
+  "iss": "https://auth.example.com",
+  "exp": 1714000000,
+  "roles": ["order:create","order:view"]
+}
+```
 
-OpenID Connect (OIDC)
+**Validation**:
+- Verify signature with shared secret or public key.
+- Check `exp` (expiry) and `iss` (issuer).
+- Inspect claims for authorization.
 
-    What it is: A thin identity layer on top of OAuth 2.0 that returns an ID token (a JWT) containing user profile claims (e.g., email, name).
+---
 
-    Use Case: Authenticate users (prove identity) as well as authorize.
+## 9.2 Network Security
 
-JSON Web Tokens (JWT)
+### Mutual TLS (mTLS)
 
-    Structure:
+- **What it is**: Both client and server present certificates and verify each other.
 
-        Header (algorithm, type)
+**Use Case**: Secure service-to-service calls in a microservices mesh.
 
-        Payload (claims: sub, exp, custom data)
+**Flow**:
+1. Client presents its cert.
+2. Server checks client cert against trusted CA.
+3. Server presents its cert; client verifies it.
+4. Encrypted channel established.
 
-        Signature (HMAC or RSA)
+---
 
-    Why: Self-contained; no need to lookup session in DB for every request.
+### Zero-Trust & IAM
 
-    Example Payload:
+- **Zero-Trust Principle**: “Never trust; always verify.” No implicit network trust—every request is authenticated and authorized.
 
-    {
-      "sub": "user123",
-      "iss": "https://auth.example.com",
-      "exp": 1714000000,
-      "roles": ["order:create","order:view"]
-    }
+- **IAM (Identity & Access Management)**: Centralizes user/service identities, roles, and permissions.
 
-    Validation:
+**Examples**: AWS IAM, Google Cloud IAM, Azure AD.
 
-        Verify signature with shared secret or public key.
+**Example Policy (AWS IAM)**:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Action": ["dynamodb:Query", "dynamodb:GetItem"],
+    "Resource": "arn:aws:dynamodb:us-east-1:123456789012:table/Orders"
+  }]
+}
+```
 
-        Check exp (expiry) and iss (issuer).
+---
 
-        Inspect claims for authorization.
+## 9.3 Rate Limiting & DDoS Protections
 
-9.2 Network Security
-Mutual TLS (mTLS)
+### Web Application Firewalls (WAF)
 
-    What it is: Both client and server present certificates and verify each other.
+- **Purpose**: Inspect incoming HTTP(s) traffic for malicious patterns (SQL injection, XSS).
+- **Example**: AWS WAF or Cloudflare WAF blocking requests with suspicious payloads.
 
-    Use Case: Secure service-to-service calls in a microservices mesh.
+---
 
-    Flow:
+### DDoS Protection
 
-        Client presents its cert.
+- **AWS Shield (Standard & Advanced)**:
+  - Automatically protects AWS resources (ELB, CloudFront) against volumetric attacks.
+- **Cloudflare**:
+  - Global Anycast network absorbs and filters malicious traffic before it hits your origin.
 
-        Server checks client cert against trusted CA.
+---
 
-        Server presents its cert; client verifies it.
+### How It Works Together
 
-        Encrypted channel established.
+- WAF filters out bad requests (layer 7).
+- Rate limits throttle excessive requests per IP or API key.
+- DDoS network (AWS Shield/Cloudflare) scrubs high-volume attacks (layer 3/4).
 
-Zero-Trust & IAM
+---
 
-    Zero-Trust Principle: “Never trust; always verify.” No implicit network trust—every request is authenticated and authorized.
+## 9.4 Data Security
 
-    IAM (Identity & Access Management):
+### Encryption At-Rest
 
-        Centralizes user/service identities, roles, and permissions.
+- **What it is**: Data stored on disk or in databases is encrypted.
 
-        Examples: AWS IAM, Google Cloud IAM, Azure AD.
+**Key Management**:
+- **KMS (Key Management Service)**: AWS KMS, Google KMS—manages creation, rotation, and permissions for encryption keys.
+- **HSM (Hardware Security Module)**: Dedicated keystores with tamper-proof hardware.
 
-    Example Policy (AWS IAM):
+**Example**:
+- Amazon S3 bucket with server-side encryption using an AWS-managed KMS key.
+- RDS database encrypted with a KMS key.
 
-    {
-      "Version": "2012-10-17",
-      "Statement": [{
-        "Effect": "Allow",
-        "Action": ["dynamodb:Query", "dynamodb:GetItem"],
-        "Resource": "arn:aws:dynamodb:us-east-1:123456789012:table/Orders"
-      }]
-    }
+---
 
-9.3 Rate Limiting & DDoS Protections
-Web Application Firewalls (WAF)
+### Encryption In-Transit
 
-    Purpose: Inspect incoming HTTP(s) traffic for malicious patterns (SQL injection, XSS).
+- **What it is**: TLS (HTTPS) ensures data is encrypted between client and server (and between services).
 
-    Example: AWS WAF or Cloudflare WAF blocking requests with suspicious payloads.
+**Certificates**:
+- Provision via public CAs (Let’s Encrypt) or internal PKI.
+- Rotate and renew regularly.
 
-DDoS Protection
+---
 
-    AWS Shield (Standard & Advanced)
+### Audit Logging
 
-        Automatically protects AWS resources (ELB, CloudFront) against volumetric attacks.
+- **What it is**: Record all security-relevant events (logins, permission changes, data access) for compliance and forensics.
 
-    Cloudflare
+**Examples**:
+- AWS CloudTrail logs all API calls.
+- Database audit logs record every `SELECT`, `INSERT`, `UPDATE`, `DELETE` with timestamp, user, and query.
 
-        Global Anycast network absorbs and filters malicious traffic before it hits your origin.
+---
 
-How It Works Together
+## Putting It All Together
 
-    WAF filters out bad requests (layer 7).
-
-    Rate limits throttle excessive requests per IP or API key.
-
-    DDoS network (AWS Shield/Cloudflare) scrubs high-volume attacks (layer 3/4).
-
-9.4 Data Security
-Encryption At-Rest
-
-    What it is: Data stored on disk or in databases is encrypted.
-
-    Key Management:
-
-        KMS (Key Management Service): AWS KMS, Google KMS—manages creation, rotation, and permissions for encryption keys.
-
-        HSM (Hardware Security Module): Dedicated keystores with tamper-proof hardware.
-
-    Example:
-
-        Amazon S3 bucket with server-side encryption using an AWS-managed KMS key.
-
-        RDS database encrypted with a KMS key.
-
-Encryption In-Transit
-
-    What it is: TLS (HTTPS) ensures data is encrypted between client and server (and between services).
-
-    Certificates:
-
-        Provision via public CAs (Let’s Encrypt) or internal PKI.
-
-        Rotate and renew regularly.
-
-Audit Logging
-
-    What it is: Record all security-relevant events (logins, permission changes, data access) for compliance and forensics.
-
-    Examples:
-
-        AWS CloudTrail logs all API calls.
-
-        Database audit logs record every SELECT, INSERT, UPDATE, DELETE with timestamp, user, and query.
-
-Putting It All Together
-
-    Authenticate users and services with OAuth 2.0/OIDC and JWTs.
-
-    Enforce network security using mTLS in service meshes and a zero-trust IAM foundation.
-
-    Protect at the edge with WAF, rate limits, and DDoS defense (Cloudflare, AWS Shield).
-
-    Encrypt data everywhere: at-rest with KMS/HSM, in-transit with TLS.
-
-    Audit all security events to detect anomalies and meet compliance needs.
+- Authenticate users and services with OAuth 2.0/OIDC and JWTs.
+- Enforce network security using mTLS in service meshes and a zero-trust IAM foundation.
+- Protect at the edge with WAF, rate limits, and DDoS defense (Cloudflare, AWS Shield).
+- Encrypt data everywhere: at-rest with KMS/HSM, in-transit with TLS.
+- Audit all security events to detect anomalies and meet compliance needs.
 
 By layering these controls, you build a defense-in-depth posture that protects your APIs, network, and data against evolving threats.
-
