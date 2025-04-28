@@ -1,0 +1,19 @@
+2025-04-28T14:38:15+05:30 [INFO] Application starting up
+2025-04-28T14:38:15+05:30 [DEBUG] This is a debug message
+2025-04-28T14:38:15+05:30 [WARNING] goroutine 4 iteration 0
+2025-04-28T14:38:15+05:30 [WARNING] goroutine 2 iteration 0
+2025-04-28T14:38:15+05:30 [WARNING] goroutine 0 iteration 0
+2025-04-28T14:38:15+05:30 [WARNING] goroutine 1 iteration 0
+2025-04-28T14:38:15+05:30 [WARNING] goroutine 3 iteration 0
+2025-04-28T14:38:15+05:30 [WARNING] goroutine 3 iteration 1
+2025-04-28T14:38:15+05:30 [WARNING] goroutine 1 iteration 1
+2025-04-28T14:38:15+05:30 [WARNING] goroutine 2 iteration 1
+2025-04-28T14:38:15+05:30 [WARNING] goroutine 4 iteration 1
+2025-04-28T14:38:15+05:30 [WARNING] goroutine 0 iteration 1
+2025-04-28T14:38:15+05:30 [WARNING] goroutine 2 iteration 2
+2025-04-28T14:38:15+05:30 [WARNING] goroutine 3 iteration 2
+2025-04-28T14:38:15+05:30 [WARNING] goroutine 4 iteration 2
+2025-04-28T14:38:15+05:30 [WARNING] goroutine 1 iteration 2
+2025-04-28T14:38:15+05:30 [WARNING] goroutine 0 iteration 2
+2025-04-28T14:38:15+05:30 [ERROR] Something went wrong
+2025-04-28T14:38:15+05:30 [FATAL] Fatal error, exiting

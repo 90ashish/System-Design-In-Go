@@ -19,15 +19,19 @@ type Level struct {
 	available map[models.VehicleType]int
 }
 
-func NewLevel(number, spotsPerType int) *Level {
+func NewLevel(levelNumber, spotsPerType int) *Level {
 	l := &Level{
-		Number:    number,
+		Number:    levelNumber,
 		available: map[models.VehicleType]int{},
 	}
-	types := []models.VehicleType{models.CarType, models.MotorcycleType, models.TruckType}
+	types := []models.VehicleType{
+		models.CarType,
+		models.MotorcycleType,
+		models.TruckType,
+	}
 	for _, t := range types {
 		for i := 0; i < spotsPerType; i++ {
-			id := fmt.Sprintf("L%d-%s-%d", number, t.String(), i+1)
+			id := fmt.Sprintf("L%d-%s-%d", levelNumber, t.String(), i+1)
 			l.spots = append(l.spots, &ParkingSpot{ID: id, SpotType: t})
 		}
 		l.available[t] = spotsPerType

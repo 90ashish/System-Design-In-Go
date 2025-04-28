@@ -85,8 +85,8 @@ Design a parking lot system that:
 
 1. Clone the repository  
 2. `cd project-root`  
-3. `go build ./cmd/parking-lot`  
-4. `./parking-lot`  
+3. `go build ./cmd/app`  
+4. `./app`  
 
 ---
 
