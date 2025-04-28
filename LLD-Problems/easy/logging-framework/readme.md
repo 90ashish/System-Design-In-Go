@@ -37,17 +37,17 @@ A thread-safe, extensible logging framework in Go supporting multiple log levels
 
  **Clone the repo**  
    ```bash
-   git clone https://github.com/your-org/go-logging-framework.git
+   Clone the repository  
    cd go-logging-framework
-   go build ./cmd/logging-app
-   ./logging-app
+   go build ./cmd/app
+   ./app
    ```
 
 ## Project Structure
 
 ```
 project-root/
-├── cmd/logging-app/
+├── cmd/app/
 │   └── main.go              # example application
 ├── internal/
 │   └── logging/
