@@ -62,7 +62,7 @@ In addition to core design patterns, this repository also covers advanced **Syst
 1. Clone the repository:
    ```bash
    git clone https://github.com/90ashish/System-Design-In-Go.git
-   cd Design\ Patterns 
+   cd design-patterns 
    ```
 
 2. Explore individual patterns in their respective folders for detailed explanations and example code.
