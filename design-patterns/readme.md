@@ -41,17 +41,21 @@ In addition to core design patterns, this repository also covers advanced **Syst
 
 ### 7. ✅ Circuit Breaker Pattern
 - Provides **failure protection** by detecting failures and preventing repeated requests to a failing service.  
-- Improves system stability and prevents cascading failures in microservices.  
+- Improves system stability and prevents cascading failures in microservices.
 
-### 8. ✅ Strangler Pattern
+### 8. ✅ Adapter Pattern
+
+### 9. ✅ Worker Pool Pattern
+
+### 10. ✅ Strangler Pattern
 - Facilitates **safe migration** from monolithic architectures to microservices by gradually replacing parts of the old system with new services.  
-- Ensures minimal disruption during refactoring.  
+- Ensures minimal disruption during refactoring.
 
-### 9. ✅ Saga Pattern
+### 11. ✅ Saga Pattern
 - Manages **distributed transactions** by coordinating multiple microservices through a sequence of compensating transactions.  
 - Ideal for ensuring data consistency across distributed systems.  
 
-### 10. ✅ Bulkhead Pattern
+### 12. ✅ Bulkhead Pattern
 - Isolates system components into **independent compartments**, ensuring that failures in one component do not affect others.  
 - Enhances system reliability by limiting the impact of failures.  
 
@@ -62,7 +66,7 @@ In addition to core design patterns, this repository also covers advanced **Syst
 1. Clone the repository:
    ```bash
    git clone https://github.com/90ashish/System-Design-In-Go.git
-   cd Design\ Patterns 
+   cd design-patterns 
    ```
 
 2. Explore individual patterns in their respective folders for detailed explanations and example code.
